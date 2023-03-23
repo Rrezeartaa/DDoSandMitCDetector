@@ -1,6 +1,98 @@
-<form action="http://localhost:8000/ddos_detection" method='POST'>
-  <input type="text" name="ip" id="ip"><br>
-  <input type="text" name="filename" id="filename"><br>
-  <input type="text" name="algorithm" id="algorithm">
-  <input type="submit" value="Submit">
-</form>
+<!DOCTYPE html>
+<html>
+   <head>
+      <title>DDoS and MitC attack detection</title>
+	<style>
+         body {
+         background-color: #F5F5F5;
+         font-family: Arial, sans-serif;
+         }
+         h1 {
+         text-align: center;
+         margin-top: 50px;
+         font-size: 3rem;
+         color: #333333;
+         text-shadow: 2px 2px #CCCCCC;
+         }
+         h2 {
+         text-align: center;
+         font-size: 1.25rem;
+         color: #333333;
+         text-shadow: 2px 2px #CCCCCC;
+         }
+         form {
+         margin: 50px auto;
+         width: 400px;
+         background-color: #CCCCCC;
+         padding: 20px;
+         border-radius: 20px;
+         box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+         }
+         label {
+         display: block;
+         margin-bottom: 10px;
+         font-size: 1.2rem;
+         color: #333333;
+         text-shadow: 1px 1px #F5F5F5;
+         }
+         input[type="text"] {
+         width: 90%;
+         padding: 10px;
+         font-size: 1.2rem;
+         border: none;
+         border-radius: 5px;
+         box-shadow: 2px 2px rgba(0, 0, 0, 0.3);
+         background-color: #F5F5F5;
+         color: #333333;
+         text-shadow: 1px 1px #CCCCCC;
+         margin-bottom: 20px;
+         margin-right: 10px;
+         }
+         input[type="submit"] {
+         display: block;
+         margin: 0 auto;
+         padding: 10px 20px;
+         background-color: #333333;
+         color: #F5F5F5;
+         font-size: 1.2rem;
+         border: none;
+         border-radius: 5px;
+         box-shadow: 2px 2px rgba(0, 0, 0, 0.3);
+         cursor: pointer;
+         text-shadow: 1px 1px #CCCCCC;
+         }
+         .progress-bar-container {
+         display: none;
+         }
+         .progress-bar {
+         background-color: #F5F5F5;
+         border-radius: 20px;
+         box-shadow: 2px 2px rgba(0, 0, 0, 0.3);
+         margin: 20px auto;
+         overflow: hidden;
+         position: relative;
+         height: 20px;
+         width: 400px;
+         }
+         .progress-bar-fill {
+         background-color: #333333;
+         height: 100%;
+         position: absolute;
+         top: 0;
+         left: 0;
+         transition: width 0.5s ease-in-out;
+         }
+         canvas {
+         margin: 50px auto;
+         }
+      </style>
+   </head>
+   <body>
+      <h1>DDoS and MitC attack detection</h1>
+      <form action = "http://localhost:8000/ddos_detection" method="POST">
+         <label for="input1">IP address of the cloud environment:</label>
+         <input type="text" id="ip" name="ip" required>
+         <input type="submit" value="Submit">
+      </form>
+   </body>
+</html>

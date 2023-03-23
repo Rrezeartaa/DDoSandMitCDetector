@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Result</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<style>
+		body {
+			background-color: #F5F5F5;
+			font-family: Arial, sans-serif;
+		}
+		h1 {
+			text-align: center;
+			margin-top: 50px;
+			font-size: 3rem;
+			color: #333333;
+			text-shadow: 2px 2px #CCCCCC;
+		}
+		h2 {
+			text-align: center;
+			margin-top: 50px;
+			font-size: 1.5rem;
+			color: #333333;
+			text-shadow: 2px 2px #CCCCCC;
+		}
+		canvas {
+			margin: 50px auto;
+		}
+	</style>
+</head>
+<body>
+	<h1>Results</h1>
+	<canvas id="myChart"></canvas>
+	<h2>The ip has a vulnerability from <b id="malicious">{{ percent_malicious }}</b> % of DDoS and MitC attack.</h2>
+	<script>
+		// Get the canvas element
+		var canvas = document.getElementById('myChart');
+
+		// Set the percentage to be displayed in the chart
+		var percentage = document.getElementById("malicious").innerHTML;
+
+		// Set the colors to be used in the chart
+		var colors = ['#E74C3C', '#FFFFFF'];
+
+		// Create the chart data
+		var data = {
+			datasets: [{
+				data: [percentage, 100 - percentage],
+				backgroundColor: colors,
+				borderWidth: 0
+			}]
+		};
+
+		// Create the chart options
+		var options = {
+			cutoutPercentage: 70,
+			legend: {
+				display: false
+			},
+			tooltips: {
+				enabled: false
+			}
+		};
+
+		// Create the doughnut chart
+		var myDoughnutChart = new Chart(canvas, {
+			type: 'doughnut',
+			data: data,
+			options: options
+		});
+	</script>
+</body>
+</html>

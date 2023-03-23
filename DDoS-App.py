@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, redirect, request, jsonify, render_template, url_for
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.svm import SVC
 from sklearn.naive_bayes import GaussianNB
@@ -7,13 +7,18 @@ from sklearn.model_selection import train_test_split
 from scapy.all import *
 import pandas as pd
 import time
+from sklearn.svm import SVC
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.compose import ColumnTransformer
+from sklearn.metrics import accuracy_score
+
 
 app = Flask(__name__)
 
 #http://localhost:8000/ddos_detection
 
 @app.route('/')
-def upload_form():
+def detection():
         return render_template('landing-page.html')
 
 @app.route('/ddos_detection', methods=['POST'])
@@ -21,8 +26,8 @@ def ddos_detection():
     # Get the inputs from the request
     
     target_ip = request.form['ip']
-    file_name = request.form['filename']
-    algorithm = request.form['algorithm']
+    #file_name = request.form['filename']
+    #algorithm = request.form['algorithm']
     
     # Define the DDoS and MitC detection function
     def detect_attack(pkt):
@@ -33,53 +38,73 @@ def ddos_detection():
                 src_port = pkt[TCP].sport
                 dst_port = pkt[TCP].dport
                 flags = pkt[TCP].flags
+                # kshyre pjesen e mitc edhe niher
                 if flags & 2 or flags & 4:
                     # SYN or RST flags set
-                    df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags'])
-                    df.to_csv(file_name + '.csv', mode='a', index=False, header=not os.path.exists(file_name + '.csv'))
-                elif flags & 16:
-                    # ACK flag set
-                    df = pd.read_csv(file_name)
-                    df = df[df['src_ip'] == src_ip]
-                    if len(df) > 0:
-                        # Potential MitC attack detected
-                        df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags'])
-                        df.to_csv(file_name + '_mitc.csv', mode='a', index=False, header=not os.path.exists(file_name + '_mitc.csv'))
+                    label = "malicious"
+                    df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags, label]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags', 'label'])
+                    df.to_csv('ddos_and_mitc_attack.csv', mode='a', index=False, header=not os.path.exists('ddos_and_mitc_attack.csv'))
+                elif 'HTTP' in pkt and len(pkt['HTTP'].fields) > 50:
+                    # HTTP request with a large number of headers - MITC attack
+                    label = "malicious"
+                    df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, len(pkt['HTTP'].fields)]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'num_headers', 'label'])
+                    df.to_csv('ddos_and_mitc_attack.csv', mode='a', index=False, header=not os.path.exists('ddos_and_mitc_attack.csv'))
+                else:
+                    label = "normal"
+                    df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags, label]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags', 'label'])
+                    df.to_csv('ddos_and_mitc_attack.csv', mode='a', index=False, header=not os.path.exists('ddos_and_mitc_attack.csv'))
+##                elif flags & 16:
+##                    # ACK flag set
+##                    df = pd.read_csv('ddos_attack.csv')
+##                    df = df[df['src_ip'] == src_ip]
+##                    if len(df) > 0:
+##                        # Potential MitC attack detected
+##                        df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags'])
+##                        df.to_csv('mitc_attack.csv', mode='a', index=False, header=not os.path.exists('mitc_attack.csv'))
     
     # Start sniffing packets
-    sniff(prn=detect_attack)
-    
+    start_time = time.time()
+    duration = 20 * 60  # 20 minutes in seconds
+    while time.time() - start_time < duration:
+            sniff(prn=detect_attack, timeout=10)
+
+    # qet pjese kshyre edhe prej ni repos ne GitHub qe e ki me qeto algoritme qysh me bo 
     # Load the traffic data into a Pandas DataFrame
-    df = pd.read_csv(file_name + '.csv')
-    
-    # Split the data into training and testing sets
-    X_train, X_test, y_train, y_test = train_test_split(df[['timestamp', 'src_ip', 'src_port', 'flags']], df['dst_ip'], test_size=0.3)
-    
-    # Train a machine learning model based on the chosen algorithm
-    if algorithm == 'decision_tree':
-        model = DecisionTreeClassifier()
-    elif algorithm == 'svm':
-        model = SVC()
-    elif algorithm == 'naive_bayes':
-        model = GaussianNB()
-    elif algorithm == 'k_means':
-        model = KMeans()
-    else:
-        print(jsonify({'error': 'Invalid algorithm choice'}))
-    
-    model.fit(X_train, y_train)
-    
-    # Make a prediction for a potential DDoS attack
-    prediction = model.predict(X_test)
-    
-    # Load the MitC data into a Pandas DataFrame
-    df_mitc = pd.read_csv(file_name + '_mitc.csv')
-    
-    # Check if there are any potential MitC attacks
-    if len(df_mitc) > 0:
-        print(jsonify({'prediction': 'MitC attack detected', 'mitc_data': df_mitc.to_dict('records')}))
-    else:
-        print(jsonify({'prediction': prediction.tolist()}))
+##    import pandas as pd
+##
+### Load the data from the CSV file
+    df = pd.read_csv('ddos_and_mitc_attack.csv')
+
+        # Define the features and labels
+    X = df[['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags']]
+    y = df['label']
+
+        # One-hot encode the IP addresses
+    ip_encoder = OneHotEncoder(categories='auto', sparse=False, handle_unknown='ignore')
+    ip_transformer = ColumnTransformer([('one_hot', ip_encoder, ['src_ip', 'dst_ip', 'flags'])], remainder='passthrough')
+    X = ip_transformer.fit_transform(X)
+
+        # Scale the features
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+
+        # Train the SVM model
+    model = SVC()
+    model.fit(X, y)
+
+        # Make a prediction
+    predictions = model.predict(X)
+    accuracy = accuracy_score(y, predictions)
+    print("Accuracy:", accuracy)
+    percent_malicious = sum(predictions == 'malicious') / len(predictions) * 100
+    print("Percentage of malicious packets in 20 minutes: {:.2f}%".format(percent_malicious))
+
+    return redirect(url_for('show_result', percent_malicious=percent_malicious))
+
+@app.route('/detection-result')
+def show_result():
+    percent_malicious = request.args.get('percent_malicious')
+    return render_template('show_result.html', percent_malicious=percent_malicious)
 
 if __name__ == '__main__':
     app.run(host="localhost", port=8000, debug=False)
