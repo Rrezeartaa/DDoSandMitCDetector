@@ -94,5 +94,53 @@
          <input type="text" id="ip" name="ip" required>
          <input type="submit" value="Submit">
       </form>
+
+	<div class="progress-bar-container">
+		<div class="progress-bar">
+			<div class="progress-bar-fill" id="progress-bar-fill"></div>
+		</div>
+
+		<script>
+			// Get the progress bar fill element
+			var progressBarFill = document.getElementById('progress-bar-fill');
+
+			// Set the initial width to 0%
+			progressBarFill.style.width = '0%';
+
+			// Set the total time of the program execution in milliseconds (20 minutes)
+			var totalTime = 1200000;
+
+			// Get the start time of the program execution
+			var startTime = Date.now();
+
+			// Define a function to update the progress bar
+			function updateProgressBar() {
+				// Get the elapsed time since the start of the program execution
+				var elapsedTime = Date.now() - startTime;
+
+				// Calculate the progress as a percentage
+				var progress = (elapsedTime / totalTime) * 100;
+
+				// Set the width of the progress bar fill element
+				progressBarFill.style.width = progress + '%';
+
+				// Check if the program execution is complete
+				if (elapsedTime < totalTime) {
+					// If not, schedule the next update in 100 milliseconds
+					setTimeout(updateProgressBar, 100);
+				}
+			}
+
+			// Add an event listener to the form
+			var form = document.querySelector('form');
+			form.addEventListener('submit', function(event) {
+				// Show the progress bar container
+				document.querySelector('.progress-bar-container').style.display = 'block';
+				// Start the progress bar update
+				updateProgressBar();
+			});
+		</script>
+		<h2>Detection is in progress...</h2>
+	</div>
    </body>
 </html>

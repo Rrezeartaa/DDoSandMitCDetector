@@ -15,7 +15,7 @@ from sklearn.metrics import accuracy_score
 
 app = Flask(__name__)
 
-#http://localhost:8000/ddos_detection
+#http://localhost:8000/
 
 @app.route('/')
 def detection():
@@ -26,8 +26,6 @@ def ddos_detection():
     # Get the inputs from the request
     
     target_ip = request.form['ip']
-    #file_name = request.form['filename']
-    #algorithm = request.form['algorithm']
     
     # Define the DDoS and MitC detection function
     def detect_attack(pkt):
@@ -53,14 +51,6 @@ def ddos_detection():
                     label = "normal"
                     df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags, label]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags', 'label'])
                     df.to_csv('ddos_and_mitc_attack.csv', mode='a', index=False, header=not os.path.exists('ddos_and_mitc_attack.csv'))
-##                elif flags & 16:
-##                    # ACK flag set
-##                    df = pd.read_csv('ddos_attack.csv')
-##                    df = df[df['src_ip'] == src_ip]
-##                    if len(df) > 0:
-##                        # Potential MitC attack detected
-##                        df = pd.DataFrame([[time.time(), src_ip, dst_ip, src_port, dst_port, flags]], columns=['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags'])
-##                        df.to_csv('mitc_attack.csv', mode='a', index=False, header=not os.path.exists('mitc_attack.csv'))
     
     # Start sniffing packets
     start_time = time.time()
@@ -68,9 +58,6 @@ def ddos_detection():
     while time.time() - start_time < duration:
             sniff(prn=detect_attack, timeout=10)
 
-    # qet pjese kshyre edhe prej ni repos ne GitHub qe e ki me qeto algoritme qysh me bo 
-    # Load the traffic data into a Pandas DataFrame
-##    import pandas as pd
 ##
 ### Load the data from the CSV file
     df = pd.read_csv('ddos_and_mitc_attack.csv')
