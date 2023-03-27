@@ -5,7 +5,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.metrics import accuracy_score
 
 # Load the data from the CSV file
-df = pd.read_csv('ddos_attack.csv')
+df = pd.read_csv('ddos_and_mitc_attack.csv')
 
 # Define the features and labels
 X = df[['timestamp', 'src_ip', 'dst_ip', 'src_port', 'dst_port', 'flags']]
@@ -28,5 +28,5 @@ prediction = model.predict(X)
 malicious_percentage = round((sum(prediction == 'malicious') / len(prediction)) * 100, 2)
 
 # Print the results
-print("Accuracy:", round(accuracy_score(y, prediction) * 100, 2), "%")
+print("Accuracy:", accuracy_score(y, prediction) * 100, "%")
 print("Percentage of malicious packets:", malicious_percentage, "%")

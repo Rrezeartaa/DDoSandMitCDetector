@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
 
 # Load the data from the CSV file
-df = pd.read_csv('ddos_attack.csv')
+df = pd.read_csv('ddos_and_mitc_attack.csv')
 
 # Remove the label column
 X = df.drop('label', axis=1)
