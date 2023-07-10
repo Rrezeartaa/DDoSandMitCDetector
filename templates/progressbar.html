@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Progress Bar Example</title>
+	<style>
+		body {
+			background-color: #F5F5F5;
+			font-family: Arial, sans-serif;
+		}
+		h1 {
+			text-align: center;
+			margin-top: 50px;
+			font-size: 3rem;
+			color: #333333;
+			text-shadow: 2px 2px #CCCCCC;
+		}
+		.progress-bar-container {
+			display: none;
+		}
+		.progress-bar {
+			background-color: #F5F5F5;
+			border-radius: 20px;
+			box-shadow: 2px 2px rgba(0, 0, 0, 0.3);
+			margin: 50px auto;
+			overflow: hidden;
+			position: relative;
+			height: 20px;
+			width: 400px;
+		}
+		.progress-bar-fill {
+			background-color: #333333;
+			height: 100%;
+			position: absolute;
+			top: 0;
+			left: 0;
+			transition: width 0.5s ease-in-out;
+		}
+	</style>
+</head>
+<body>
+	<h1>Progress Bar Example</h1>
+
+	<form>
+		<input type="submit" value="Submit">
+	</form>
+
+	<div class="progress-bar-container">
+		<div class="progress-bar">
+			<div class="progress-bar-fill" id="progress-bar-fill"></div>
+		</div>
+
+		<script>
+			// Get the progress bar fill element
+			var progressBarFill = document.getElementById('progress-bar-fill');
+
+			// Set the initial width to 0%
+			progressBarFill.style.width = '0%';
+
+			// Set the total time of the program execution in milliseconds (20 minutes)
+			var totalTime = 1200000;
+
+			// Get the start time of the program execution
+			var startTime = Date.now();
+
+			// Define a function to update the progress bar
+			function updateProgressBar() {
+				// Get the elapsed time since the start of the program execution
+				var elapsedTime = Date.now() - startTime;
+
+				// Calculate the progress as a percentage
+				var progress = (elapsedTime / totalTime) * 100;
+
+				// Set the width of the progress bar fill element
+				progressBarFill.style.width = progress + '%';
+
+				// Check if the program execution is complete
+				if (elapsedTime < totalTime) {
+					// If not, schedule the next update in 100 milliseconds
+					setTimeout(updateProgressBar, 100);
+				}
+			}
+
+			// Add an event listener to the form
+			var form = document.querySelector('form');
+			form.addEventListener('submit', function(event) {
+				event.preventDefault();
+				// Show the progress bar container
+				document.querySelector('.progress-bar-container').style.display = 'block';
+				// Start the progress bar update
+				updateProgressBar();
+			});
+		</script>
+	</div>
+
+</body>
+</html>
