@@ -1,2 +1,3 @@
 # DDoSandMitCDetector
- 
+
+This application is developed for simulating DDoS and MitC attacks against a cloud environment for then to detect them through machine learning algorithms. First, the traffic will be analyzed, for example the number of packets per second, the size of the sent packet and the sequence number. At the same time when analyzing the traffic the data will be stored in a dataset containing also other parameters as source_ip, destination_ip, syn_bit, etc. This data will be trained by four models of the machine learning algorithms such as Decision Trees, Support Vector Machine (SVM), Naive Bayes and K-Nearest Neighbors (KNN). The application will then evaluate the performance of each algorithm focusing on accuracy. With the help of the best chosen algorithm, the prediction will be made when these attacks are most likely to occur in a cloud environment.
